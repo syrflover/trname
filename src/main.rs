@@ -212,8 +212,7 @@ impl FileMetadata {
         )
         .unwrap();
 
-        let regex_without_rel_name =
-            Regex::new(r"^.+\s(-\s)?(?<episode>[0-9]+).*\.(?<ext>\w+)$").unwrap();
+        let regex_without_rel_name = Regex::new(r"(?<episode>[0-9]+).*\.(?<ext>\w+)$").unwrap();
 
         let captured = regex.captures(s).or(regex_without_rel_name.captures(s))?;
 
@@ -270,6 +269,18 @@ fn tests_regex() {
     let without_rel_name = FileMetadata::new("프리렌 1.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 1);
+
+    let without_rel_name = FileMetadata::new("프리렌 1 (F).ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 1);
+
+    let without_rel_name = FileMetadata::new("nogame01.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 1);
+
+    let without_rel_name = FileMetadata::new("nogame12.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 12);
 
     //
     // Dir
