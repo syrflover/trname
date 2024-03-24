@@ -212,9 +212,18 @@ impl FileMetadata {
         )
         .unwrap();
 
-        let regex_without_rel_name = Regex::new(r"(?<episode>[0-9]+).*\.(?<ext>\w+)$").unwrap();
+        let regex_without_rel_name_3 =
+            Regex::new(r"^.+(?<episode>[0-9]{3,3}).*\.(?<ext>\w+)$").unwrap();
+        let regex_without_rel_name_2 =
+            Regex::new(r"^.+(?<episode>[0-9]{2,2}).*\.(?<ext>\w+)$").unwrap();
+        let regex_without_rel_name_1 =
+            Regex::new(r"^.+(?<episode>[0-9]{1,1}).*\.(?<ext>\w+)$").unwrap();
 
-        let captured = regex.captures(s).or(regex_without_rel_name.captures(s))?;
+        let captured = regex
+            .captures(s)
+            .or(regex_without_rel_name_3.captures(s))
+            .or(regex_without_rel_name_2.captures(s))
+            .or(regex_without_rel_name_1.captures(s))?;
 
         fn parse_episode(s: &str) -> Option<usize> {
             if s.starts_with('0') {
@@ -281,6 +290,14 @@ fn tests_regex() {
     let without_rel_name = FileMetadata::new("nogame12.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 12);
+
+    let without_rel_name = FileMetadata::new("no1game12.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 12);
+
+    let without_rel_name = FileMetadata::new("Bocchi the Rock! S01E05.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 5);
 
     //
     // Dir
