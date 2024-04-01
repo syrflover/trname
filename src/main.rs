@@ -68,6 +68,24 @@ fn main() {
         season = text.parse().unwrap();
     }
 
+    let starts_episode_at = {
+        if season == 0 {
+            Some(
+                Text::new("starts episode at:")
+                    .with_initial_value("1")
+                    .with_validator(UsizeValidator {
+                        message: "invalid episode".to_owned(),
+                    })
+                    .prompt()
+                    .unwrap()
+                    .parse::<usize>()
+                    .unwrap(),
+            )
+        } else {
+            None
+        }
+    };
+
     println!();
 
     let files = {
@@ -82,7 +100,11 @@ fn main() {
             if x.metadata().unwrap().is_file() {
                 let file_name = x.file_name().into_string().unwrap();
 
-                if let Some(FileMetadata { episode, ext }) = FileMetadata::new(&file_name) {
+                if let Some(FileMetadata { mut episode, ext }) = FileMetadata::new(&file_name) {
+                    if let Some(starts_episode_at) = starts_episode_at {
+                        episode += starts_episode_at - 1;
+                    }
+
                     let after = format!(
                         "{} S{}E{}.{}",
                         title,
@@ -102,11 +124,15 @@ fn main() {
     };
 
     for (modified_file_name, file) in files.iter() {
-        println!(
-            "{:?} -> {:?}",
-            file.file_name().as_os_str().to_string_lossy(),
-            modified_file_name
-        );
+        let modified_target = target_dir.join(modified_file_name);
+
+        if !modified_target.exists() {
+            println!(
+                "{:?} -> {:?}",
+                file.file_name().as_os_str().to_string_lossy(),
+                modified_file_name
+            );
+        }
 
         // 사용법
         // 1. 제목으로 이루어진 폴더를 만든다 -> Kono Subarashii Sekai ni Shukufuku wo!
@@ -213,11 +239,11 @@ impl FileMetadata {
         .unwrap();
 
         let regex_without_rel_name_3 =
-            Regex::new(r"^.+(?<episode>[0-9]{3,3}).*\.(?<ext>\w+)$").unwrap();
+            Regex::new(r"^.*(?<episode>[0-9]{3,3}).*\.(?<ext>\w+)$").unwrap();
         let regex_without_rel_name_2 =
-            Regex::new(r"^.+(?<episode>[0-9]{2,2}).*\.(?<ext>\w+)$").unwrap();
+            Regex::new(r"^.*(?<episode>[0-9]{2,2}).*\.(?<ext>\w+)$").unwrap();
         let regex_without_rel_name_1 =
-            Regex::new(r"^.+(?<episode>[0-9]{1,1}).*\.(?<ext>\w+)$").unwrap();
+            Regex::new(r"^.*(?<episode>[0-9]{1,1}).*\.(?<ext>\w+)$").unwrap();
 
         let captured = regex
             .captures(s)
@@ -296,6 +322,10 @@ fn tests_regex() {
     assert_eq!(without_rel_name.episode, 12);
 
     let without_rel_name = FileMetadata::new("Bocchi the Rock! S01E05.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 5);
+
+    let without_rel_name = FileMetadata::new("5.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 5);
 
