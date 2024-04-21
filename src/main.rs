@@ -68,17 +68,34 @@ fn main() {
         season = text.parse().unwrap();
     }
 
+    #[derive(Clone)]
+    struct IsizeValidator {
+        message: String,
+    }
+
+    impl StringValidator for IsizeValidator {
+        fn validate(&self, input: &str) -> Result<Validation, inquire::CustomUserError> {
+            if input.parse::<isize>().is_ok() {
+                Ok(Validation::Valid)
+            } else {
+                Ok(Validation::Invalid(ErrorMessage::Custom(
+                    self.message.clone(),
+                )))
+            }
+        }
+    }
+
     let starts_episode_at = {
         if season == 0 {
             Some(
                 Text::new("starts episode at:")
                     .with_initial_value("1")
-                    .with_validator(UsizeValidator {
+                    .with_validator(IsizeValidator {
                         message: "invalid episode".to_owned(),
                     })
                     .prompt()
                     .unwrap()
-                    .parse::<usize>()
+                    .parse::<isize>()
                     .unwrap(),
             )
         } else {
@@ -102,7 +119,15 @@ fn main() {
 
                 if let Some(FileMetadata { mut episode, ext }) = FileMetadata::new(&file_name) {
                     if let Some(starts_episode_at) = starts_episode_at {
-                        episode += starts_episode_at - 1;
+                        episode = episode
+                            .checked_add_signed(if starts_episode_at.is_negative() {
+                                starts_episode_at
+                            } else if starts_episode_at.is_positive() {
+                                starts_episode_at - 1
+                            } else {
+                                0
+                            })
+                            .unwrap();
                     }
 
                     let after = format!(
@@ -233,11 +258,15 @@ struct FileMetadata {
 
 impl FileMetadata {
     pub fn new(s: &str) -> Option<Self> {
-        let regex = Regex::new(
+        let regex_with_rel_name_1 = Regex::new(
             r"(?i)^\[.+\]\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?\.(?<ext>\w+)$",
         )
         .unwrap();
 
+        let regex_without_rel_name_4 = Regex::new(
+            r"(?i)^.+\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?.+\.(?<ext>\w+)$",
+        )
+        .unwrap();
         let regex_without_rel_name_3 =
             Regex::new(r"^.*(?<episode>[0-9]{3,3}).*\.(?<ext>\w+)$").unwrap();
         let regex_without_rel_name_2 =
@@ -245,8 +274,9 @@ impl FileMetadata {
         let regex_without_rel_name_1 =
             Regex::new(r"^.*(?<episode>[0-9]{1,1}).*\.(?<ext>\w+)$").unwrap();
 
-        let captured = regex
+        let captured = regex_with_rel_name_1
             .captures(s)
+            .or(regex_without_rel_name_4.captures(s))
             .or(regex_without_rel_name_3.captures(s))
             .or(regex_without_rel_name_2.captures(s))
             .or(regex_without_rel_name_1.captures(s))?;
@@ -328,6 +358,11 @@ fn tests_regex() {
     let without_rel_name = FileMetadata::new("5.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 5);
+
+    let without_rel_name =
+        FileMetadata::new("Ookami to Koushinryou (2024) - 01SubsPlease.smi").unwrap();
+
+    assert_eq!(without_rel_name.episode, 1);
 
     //
     // Dir
