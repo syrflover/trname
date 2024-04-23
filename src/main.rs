@@ -9,8 +9,16 @@ use regex::Regex;
 fn main() {
     // /<parent>/[HorribleSubs] Kono Subarashii Sekai ni Shukufuku wo! 2 (1-12) (Batch) [1080p]
     let target_dir = std::env::args()
-        .find_map(|p| p.parse::<PathBuf>().ok().filter(|p| p.is_dir()))
-        .or(current_dir().ok())
+        .last()
+        .map(|p| {
+            if p.starts_with('/') || p.starts_with("./") {
+                p
+            } else {
+                "./".to_owned() + &p
+            }
+        })
+        .map(|p| p.parse::<PathBuf>().ok().filter(|p| p.is_dir()))
+        .unwrap_or(current_dir().ok())
         .expect("invalid path");
 
     println!("{}", target_dir.as_os_str().to_string_lossy());
