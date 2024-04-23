@@ -117,7 +117,9 @@ fn main() {
             if x.metadata().unwrap().is_file() {
                 let file_name = x.file_name().into_string().unwrap();
 
-                if let Some(FileMetadata { mut episode, ext }) = FileMetadata::new(&file_name) {
+                if let Some(FileMetadata { mut episode, ext }) =
+                    FileMetadata::new(&title, &file_name)
+                {
                     if let Some(starts_episode_at) = starts_episode_at {
                         episode = episode
                             .checked_add_signed(if starts_episode_at.is_negative() {
@@ -257,7 +259,21 @@ struct FileMetadata {
 }
 
 impl FileMetadata {
-    pub fn new(s: &str) -> Option<Self> {
+    pub fn new(title: &str, s: &str) -> Option<Self> {
+        if s.starts_with(title) {
+            let s = s.replacen(title, "", 1);
+            let captured = Regex::new(r"(?i)^S[0-9]{2,2}E(?<episode>[0-9]{2,2})\.(?<ext>\w+)$")
+                .unwrap()
+                .captures(&s.trim());
+
+            if let Some(captured) = captured {
+                let episode = parse_episode(&captured["episode"])?;
+                let ext = captured["ext"].to_owned();
+
+                return Some(Self { episode, ext });
+            }
+        }
+
         let regex_with_rel_name_1 = Regex::new(
             r"(?i)^\[.+\]\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?\.(?<ext>\w+)$",
         )
@@ -306,6 +322,7 @@ fn tests_regex() {
     //
 
     let beatrice = FileMetadata::new(
+        "Kono Subarashii Sekai ni Shukufuku wo!",
         "[Beatrice-Raws] Kono Subarashii Sekai ni Shukufuku wo! 04 (BDRip 1920x1080 x264 FLAC).mkv",
     )
     .unwrap();
@@ -313,6 +330,7 @@ fn tests_regex() {
     assert_eq!(beatrice.episode, 4);
 
     let subsplease = FileMetadata::new(
+        "Kono Subarashii Sekai ni Bakuen wo!",
         "[SubsPlease] Kono Subarashii Sekai ni Bakuen wo! - 01 (1080p) [10709A2B].mkv",
     )
     .unwrap();
@@ -320,49 +338,62 @@ fn tests_regex() {
     assert_eq!(subsplease.episode, 1);
 
     let moozzi2 = FileMetadata::new(
+        "Fullmetal Alchemist Brotherhood",
         "[Moozzi2] Fullmetal Alchemist Brotherhood - 64 END (BD 1920x1080 x.264 Flac).mkv",
     )
     .unwrap();
 
     assert_eq!(moozzi2.episode, 64);
 
-    let without_rel_name =
-        FileMetadata::new("Kono Subarashii Sekai ni Bakuen wo! - 01LoremIpsum.smi").unwrap();
+    let without_rel_name = FileMetadata::new(
+        "Kono Subarashii Sekai ni Bakuen wo!",
+        "Kono Subarashii Sekai ni Bakuen wo! - 01LoremIpsum.smi",
+    )
+    .unwrap();
 
     assert_eq!(without_rel_name.episode, 1);
 
-    let without_rel_name = FileMetadata::new("프리렌 1.ass").unwrap();
+    let without_rel_name = FileMetadata::new("Sousou no Frieren", "프리렌 1.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 1);
 
-    let without_rel_name = FileMetadata::new("프리렌 1 (F).ass").unwrap();
+    let without_rel_name = FileMetadata::new("Sousou no Frieren", "프리렌 1 (F).ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 1);
 
-    let without_rel_name = FileMetadata::new("nogame01.ass").unwrap();
+    let without_rel_name = FileMetadata::new("No Game No Life", "nogame01.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 1);
 
-    let without_rel_name = FileMetadata::new("nogame12.ass").unwrap();
+    let without_rel_name = FileMetadata::new("No Game No Life", "nogame12.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 12);
 
-    let without_rel_name = FileMetadata::new("no1game12.ass").unwrap();
+    let without_rel_name = FileMetadata::new("No Game No Life", "no1game12.ass").unwrap();
 
     assert_eq!(without_rel_name.episode, 12);
 
-    let without_rel_name = FileMetadata::new("Bocchi the Rock! S01E05.ass").unwrap();
-
-    assert_eq!(without_rel_name.episode, 5);
-
-    let without_rel_name = FileMetadata::new("5.ass").unwrap();
-
-    assert_eq!(without_rel_name.episode, 5);
-
     let without_rel_name =
-        FileMetadata::new("Ookami to Koushinryou (2024) - 01SubsPlease.smi").unwrap();
+        FileMetadata::new("Bocchi the Rock!", "Bocchi the Rock! S01E05.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 5);
+
+    let without_rel_name = FileMetadata::new("Bocchi the Rock!", "5.ass").unwrap();
+
+    assert_eq!(without_rel_name.episode, 5);
+
+    let without_rel_name = FileMetadata::new(
+        "Spice and Wolf (2024)",
+        "Ookami to Koushinryou (2024) - 01SubsPlease.smi",
+    )
+    .unwrap();
 
     assert_eq!(without_rel_name.episode, 1);
+
+    let without_rel_name =
+        FileMetadata::new("Spice and Wolf (2024)", "Spice and Wolf (2024) S01E04.smi").unwrap();
+
+    assert_eq!(without_rel_name.episode, 4);
 
     //
     // Dir
