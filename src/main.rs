@@ -94,21 +94,21 @@ fn main() {
     }
 
     let starts_episode_at = {
-        if season == 0 {
-            Some(
-                Text::new("starts episode at:")
-                    .with_initial_value("1")
-                    .with_validator(IsizeValidator {
-                        message: "invalid episode".to_owned(),
-                    })
-                    .prompt()
-                    .unwrap()
-                    .parse::<isize>()
-                    .unwrap(),
-            )
-        } else {
-            None
-        }
+        // if season == 0 {
+        Some(
+            Text::new("starts episode at:")
+                .with_initial_value("1")
+                .with_validator(IsizeValidator {
+                    message: "invalid episode".to_owned(),
+                })
+                .prompt()
+                .unwrap()
+                .parse::<isize>()
+                .unwrap(),
+        )
+        // } else {
+        //     None
+        // }
     };
 
     println!();
@@ -283,7 +283,7 @@ impl FileMetadata {
         }
 
         let regex_with_rel_name_1 = Regex::new(
-            r"(?i)^\[.+\]\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?\.(?<ext>\w+)$",
+            r"(?i)^\[.+\]\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?\w*\.(?<ext>\w+)$",
         )
         .unwrap();
 
@@ -336,6 +336,14 @@ fn tests_regex() {
     .unwrap();
 
     assert_eq!(beatrice.episode, 4);
+
+    let beatrice = FileMetadata::new(
+        "Kaguya-sama wa Kokurasetai",
+        "[Beatrice-Raws] Kaguya-sama wa Kokurasetai 08 [BDRip 1920x1080 HEVC FLAC]_rev.mkv",
+    )
+    .unwrap();
+
+    assert_eq!(beatrice.episode, 8);
 
     let subsplease = FileMetadata::new(
         "Kono Subarashii Sekai ni Bakuen wo!",
