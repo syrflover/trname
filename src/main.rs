@@ -287,12 +287,12 @@ impl FileMetadata {
         )
         .unwrap();
 
-        let regex_without_rel_name_4 = Regex::new(
-            r"(?i)^.+\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?.+\.(?<ext>\w+)$",
-        )
-        .unwrap();
-        let regex_without_rel_name_3 =
-            Regex::new(r"^.*(?<episode>[0-9]{3,3}).*\.(?<ext>\w+)$").unwrap();
+        // let regex_without_rel_name_4 = Regex::new(
+        //     r"(?i)^.+\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?.+\.(?<ext>\w+)$",
+        // )
+        // .unwrap();
+        // let regex_without_rel_name_3 =
+        //     Regex::new(r"^.*(?<episode>[0-9]{3,3}).*\.(?<ext>\w+)$").unwrap();
         let regex_without_rel_name_2 =
             Regex::new(r"^.*(?<episode>[0-9]{2,2}).*\.(?<ext>\w+)$").unwrap();
         let regex_without_rel_name_1 =
@@ -300,8 +300,8 @@ impl FileMetadata {
 
         let captured = regex_with_rel_name_1
             .captures(s)
-            .or(regex_without_rel_name_4.captures(s))
-            .or(regex_without_rel_name_3.captures(s))
+            // .or(regex_without_rel_name_4.captures(s))
+            // .or(regex_without_rel_name_3.captures(s))
             .or(regex_without_rel_name_2.captures(s))
             .or(regex_without_rel_name_1.captures(s))?;
 
@@ -410,6 +410,22 @@ fn tests_regex() {
         FileMetadata::new("Spice and Wolf (2024)", "Spice and Wolf (2024) S01E04.smi").unwrap();
 
     assert_eq!(without_rel_name.episode, 4);
+
+    let without_rel_name = FileMetadata::new(
+        "Kaguya-sama wa Kokurasetai",
+        "카구야 님은 고백받고 싶어 03.smi",
+    )
+    .unwrap();
+
+    assert_eq!(without_rel_name.episode, 3);
+
+    let without_rel_name = FileMetadata::new(
+        "Kaguya-sama wa Kokurasetai",
+        "카구야 님은 고백받고 싶어 11.smi",
+    )
+    .unwrap();
+
+    assert_eq!(without_rel_name.episode, 11);
 
     //
     // Dir
