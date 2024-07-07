@@ -268,17 +268,38 @@ struct FileMetadata {
 
 impl FileMetadata {
     pub fn new(title: &str, s: &str) -> Option<Self> {
-        if s.starts_with(title) {
-            let s = s.replacen(title, "", 1);
-            let captured = Regex::new(r"(?i)^S[0-9]{2,2}E(?<episode>[0-9]{2,2})\.(?<ext>\w+)$")
-                .unwrap()
-                .captures(&s.trim());
+        fn parse_episode(s: &str) -> Option<usize> {
+            if s.starts_with('0') {
+                return parse_episode(&s[1..]);
+            } else {
+                &s
+            }
+            .parse()
+            .ok()
+        }
 
-            if let Some(captured) = captured {
-                let episode = parse_episode(&captured["episode"])?;
-                let ext = captured["ext"].to_owned();
+        for (cond, regex) in [
+            (
+                // SxxExx
+                s.starts_with(title),
+                r"(?i)^S[0-9]{2,2}E(?<episode>[0-9]{2,2})\.(?<ext>\w+)$",
+            ),
+            (
+                // SubsPlease
+                s.starts_with("[SubsPlease]"),
+                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2})(\s\((480p|720p|1080p)\))?(\s\[\w+\])?.*\.(?<ext>\w+)$",
+            ),
+        ] {
+            if cond {
+                let s = s.replacen(title, "", 1);
+                let captured = Regex::new(regex).unwrap().captures(&s.trim());
 
-                return Some(Self { episode, ext });
+                if let Some(captured) = captured {
+                    let episode = parse_episode(&captured["episode"])?;
+                    let ext = captured["ext"].to_owned();
+
+                    return Some(Self { episode, ext });
+                }
             }
         }
 
@@ -304,16 +325,6 @@ impl FileMetadata {
             // .or(regex_without_rel_name_3.captures(s))
             .or(regex_without_rel_name_2.captures(s))
             .or(regex_without_rel_name_1.captures(s))?;
-
-        fn parse_episode(s: &str) -> Option<usize> {
-            if s.starts_with('0') {
-                return parse_episode(&s[1..]);
-            } else {
-                &s
-            }
-            .parse()
-            .ok()
-        }
 
         let episode = parse_episode(&captured["episode"])?;
 
@@ -350,6 +361,27 @@ fn tests_regex() {
         "[SubsPlease] Kono Subarashii Sekai ni Bakuen wo! - 01 (1080p) [10709A2B].mkv",
     )
     .unwrap();
+
+    assert_eq!(subsplease.episode, 1);
+
+    let subsplease = FileMetadata::new(
+        "",
+        "[SubsPlease] Tensui no Sakuna-hime - 01 (1080p) [F0D958CB]-2.smi",
+    )
+    .unwrap();
+
+    assert_eq!(subsplease.episode, 1);
+
+    let subsplease = FileMetadata::new(
+        "",
+        "[SubsPlease] Tensui no Sakuna-hime - 01 [F0D958CB]-2.smi",
+    )
+    .unwrap();
+
+    assert_eq!(subsplease.episode, 1);
+
+    let subsplease =
+        FileMetadata::new("", "[SubsPlease] Tensui no Sakuna-hime - 01 (1080p)-2.smi").unwrap();
 
     assert_eq!(subsplease.episode, 1);
 
