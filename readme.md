@@ -18,11 +18,11 @@ cargo install --path ./trname
 2. `[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP` 를 제목 폴더 안으로 이동함
 3. trname 실행
 ```bash
-trname "/Lycoris Recoil/[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP"
+trname "Lycoris Recoil/[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP"
 ```
 4. 시즌 넘버 수정
 ```
-/Lycoris Recoil/[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP
+./Lycoris Recoil/[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP
 
 Lycoris Recoil
 
