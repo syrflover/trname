@@ -65,7 +65,7 @@ season: 1
 ```
 6. 최종적으로는 아래와 같은 폴더 구조가 됨
 ```
-/Lycoris Recoil
+Lycoris Recoil
 └── Season 01
     ├── Lycoris Recoil S01E01.mkv
     ├── Lycoris Recoil S01E01.smi
