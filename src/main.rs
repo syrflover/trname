@@ -289,6 +289,11 @@ impl FileMetadata {
                 s.starts_with("[SubsPlease]"),
                 r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2})(\s\((480p|720p|1080p)\))?(\s\[\w+\])?.*\.(?<ext>\w+)$",
             ),
+            (
+                // Moozzi2
+                s.starts_with("[Moozzi2]"),
+                r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,2}).+\.(?<ext>\w+)$",
+            ),
         ] {
             if cond {
                 let s = s.replacen(title, "", 1);
@@ -392,6 +397,22 @@ fn tests_regex() {
     .unwrap();
 
     assert_eq!(moozzi2.episode, 64);
+
+    let moozzi2 = FileMetadata::new(
+        "Spy x Family",
+        "[Moozzi2] Spy x Family S2 - 12 END [ 37 ] (BD 1920x1080 x265-10Bit Flac).mkv",
+    )
+    .unwrap();
+
+    assert_eq!(moozzi2.episode, 12);
+
+    let moozzi2 = FileMetadata::new(
+        "Watashi no Shiawase na Kekkon",
+        "[Moozzi2] Watashi no Shiawase na Kekkon - 10 (BD 1920x1080 x265-10Bit Flac).mkv",
+    )
+    .unwrap();
+
+    assert_eq!(moozzi2.episode, 10);
 
     let without_rel_name = FileMetadata::new(
         "Kono Subarashii Sekai ni Bakuen wo!",
