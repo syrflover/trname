@@ -282,7 +282,7 @@ impl FileMetadata {
             (
                 // SxxExx
                 s.starts_with(title),
-                r"(?i)^S[0-9]{2,2}E(?<episode>[0-9]{2,2})\.(?<ext>\w+)$",
+                r"(?i)^.*S[0-9]{2,2}E(?<episode>[0-9]{2,2})\.(?<ext>\w+)$",
             ),
             (
                 // SubsPlease
@@ -296,7 +296,6 @@ impl FileMetadata {
             ),
         ] {
             if cond {
-                let s = s.replacen(title, "", 1);
                 let captured = Regex::new(regex).unwrap().captures(&s.trim());
 
                 if let Some(captured) = captured {
@@ -345,6 +344,11 @@ fn tests_regex() {
     // File
     //
 
+    let tvdb =
+        FileMetadata::new("Tensui no Sakuna-hime", "Tensui no Sakuna-hime S01E03.smi").unwrap();
+
+    assert_eq!(tvdb.episode, 3);
+
     let beatrice = FileMetadata::new(
         "Kono Subarashii Sekai ni Shukufuku wo!",
         "[Beatrice-Raws] Kono Subarashii Sekai ni Shukufuku wo! 04 (BDRip 1920x1080 x264 FLAC).mkv",
@@ -370,7 +374,7 @@ fn tests_regex() {
     assert_eq!(subsplease.episode, 1);
 
     let subsplease = FileMetadata::new(
-        "",
+        "Tensui no Sakuna-hime",
         "[SubsPlease] Tensui no Sakuna-hime - 01 (1080p) [F0D958CB]-2.smi",
     )
     .unwrap();
@@ -378,7 +382,7 @@ fn tests_regex() {
     assert_eq!(subsplease.episode, 1);
 
     let subsplease = FileMetadata::new(
-        "",
+        "Tensui no Sakuna-hime",
         "[SubsPlease] Tensui no Sakuna-hime - 01 [F0D958CB]-2.smi",
     )
     .unwrap();
