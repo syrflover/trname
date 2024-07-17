@@ -27,7 +27,7 @@ pub fn trname(path: impl AsRef<Path>, file_name: &str, starts_episode_at: isize)
         .into_string()
         .ok()?;
 
-    println!("{title} {season}");
+    // println!("{title} {season}");
 
     let Directory { season } = Directory::from_normalized(&season)?;
 
@@ -72,4 +72,12 @@ fn test_trname() {
     );
 
     assert_eq!(actual.unwrap(), "Giji Harem S01E02.mkv");
+
+    let actual = trname(
+        PathBuf::from("./media/Shows (current)/Tensei Shitara Slime Datta Ken/Season 03"),
+        "[SubsPlease] Tensei Shitara Slime Datta Ken - 62 (1080p) [0214B01E].mkv",
+        -48,
+    );
+
+    assert_eq!(actual.unwrap(), "Tensei Shitara Slime Datta Ken S03E14.mkv");
 }
