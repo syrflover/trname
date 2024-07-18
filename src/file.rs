@@ -3,7 +3,6 @@ use regex::Regex;
 pub struct File {
     pub episode: usize,
     pub ext: String,
-    // pub(crate) dir_entry: DirEntry,
 }
 
 impl File {
@@ -18,6 +17,8 @@ impl File {
             .ok()
         }
 
+        let s = s.trim();
+
         for (cond, regex) in [
             (
                 // SxxExx
@@ -27,16 +28,21 @@ impl File {
             (
                 // SubsPlease
                 s.starts_with("[SubsPlease]"),
-                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2})(\s\((480p|720p|1080p)\))?(\s\[\w+\])?.*\.(?<ext>\w+)$",
+                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2})(\s)?(\((480p|720p|1080p)\))?(\s)?(\[\w+\])?.*\.(?<ext>\w+)$",
             ),
             (
                 // Moozzi2
                 s.starts_with("[Moozzi2]"),
                 r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,2}).+\.(?<ext>\w+)$",
             ),
+            (
+                // Ioroid
+                s.starts_with("[Ioroid]"),
+                r"(?i)^\[Ioroid\] .+ - (?<episode>[0-9]{1,2})(\s)?(\(.+\))?(\s)?(\[.+\])?.*\.(?<ext>\w+)$",
+            ),
         ] {
             if cond {
-                let captured = Regex::new(regex).unwrap().captures(&s.trim());
+                let captured = Regex::new(regex).unwrap().captures(s);
 
                 if let Some(captured) = captured {
                     let episode = parse_episode(&captured["episode"])?;
@@ -158,6 +164,22 @@ fn tests_regex() {
     .unwrap();
 
     assert_eq!(moozzi2.episode, 10);
+
+    let ioroid = File::new(
+        "Shikanoko Nokonoko Koshitantan",
+        "[Ioroid] Shikanoko Nokonoko Koshitantan - 02 [ABEMA WEB-DL 1080p AVC AAC]-2.smi",
+    )
+    .unwrap();
+
+    assert_eq!(ioroid.episode, 2);
+
+    let ioroid = File::new(
+        "Urusei Yatsura",
+        "[Ioroid] Urusei Yatsura (2022) 2nd Season - 23 (46) [AMZN WEB-DL 1080p AVC E-AC3].mkv",
+    )
+    .unwrap();
+
+    assert_eq!(ioroid.episode, 23);
 
     let without_rel_name = File::new(
         "Kono Subarashii Sekai ni Bakuen wo!",
