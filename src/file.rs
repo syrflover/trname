@@ -1,13 +1,14 @@
 use regex::Regex;
 
+#[derive(Debug, Clone)]
 pub struct File {
-    pub episode: usize,
+    pub episode: f32,
     pub ext: String,
 }
 
 impl File {
     pub fn new(title: &str, s: &str) -> Option<Self> {
-        fn parse_episode(s: &str) -> Option<usize> {
+        fn parse_episode(s: &str) -> Option<f32> {
             if s.starts_with('0') {
                 return parse_episode(&s[1..]);
             } else {
@@ -23,22 +24,22 @@ impl File {
             (
                 // SxxExx
                 s.starts_with(title),
-                r"(?i)^.*S[0-9]{2,2}E(?<episode>[0-9]{2,2})\.(?<ext>\w+)$",
+                r"(?i)^.*S[0-9]{2,2}E(?<episode>[0-9]{2,2}(\.[0-9]{1,1})?)\.(?<ext>\w+)$",
             ),
             (
                 // SubsPlease
                 s.starts_with("[SubsPlease]"),
-                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2})(\s)?(\((480p|720p|1080p)\))?(\s)?(\[\w+\])?.*\.(?<ext>\w+)$",
+                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?)(v[0-9]{1,2})?(\s)?(\((480p|720p|1080p)\))?(\s)?(\[\w+\])?.*\.(?<ext>\w+)$",
             ),
             (
                 // Moozzi2
                 s.starts_with("[Moozzi2]"),
-                r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,2}).+\.(?<ext>\w+)$",
+                r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?).+\.(?<ext>\w+)$",
             ),
             (
                 // Ioroid
                 s.starts_with("[Ioroid]"),
-                r"(?i)^\[Ioroid\] .+ - (?<episode>[0-9]{1,2})(\s)?(\(.+\))?(\s)?(\[.+\])?.*\.(?<ext>\w+)$",
+                r"(?i)^\[Ioroid\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?)(\s)?(\(.+\))?(\s)?(\[.+\])?.*\.(?<ext>\w+)$",
             ),
         ] {
             if cond {
@@ -94,7 +95,7 @@ fn tests_regex() {
 
     let tvdb = File::new("Tensui no Sakuna-hime", "Tensui no Sakuna-hime S01E03.smi").unwrap();
 
-    assert_eq!(tvdb.episode, 3);
+    assert_eq!(tvdb.episode, 3.0);
 
     let beatrice = File::new(
         "Kono Subarashii Sekai ni Shukufuku wo!",
@@ -102,7 +103,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(beatrice.episode, 4);
+    assert_eq!(beatrice.episode, 4.0);
 
     let beatrice = File::new(
         "Kaguya-sama wa Kokurasetai",
@@ -110,7 +111,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(beatrice.episode, 8);
+    assert_eq!(beatrice.episode, 8.0);
 
     let subsplease = File::new(
         "Kono Subarashii Sekai ni Bakuen wo!",
@@ -118,7 +119,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(subsplease.episode, 1);
+    assert_eq!(subsplease.episode, 1.0);
 
     let subsplease = File::new(
         "Tensui no Sakuna-hime",
@@ -126,7 +127,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(subsplease.episode, 1);
+    assert_eq!(subsplease.episode, 1.0);
 
     let subsplease = File::new(
         "Tensui no Sakuna-hime",
@@ -134,12 +135,31 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(subsplease.episode, 1);
+    assert_eq!(subsplease.episode, 1.0);
 
-    let subsplease =
-        File::new("", "[SubsPlease] Tensui no Sakuna-hime - 01 (1080p)-2.smi").unwrap();
+    let subsplease = File::new(
+        "Tensui no Sakuna-hime",
+        "[SubsPlease] Tensui no Sakuna-hime - 01 (1080p)-2.smi",
+    )
+    .unwrap();
 
-    assert_eq!(subsplease.episode, 1);
+    assert_eq!(subsplease.episode, 1.0);
+
+    let subsplease = File::new(
+        "Tensei Shitara Slime Datta Ken",
+        "[SubsPlease] Tensei Shitara Slime Datta Ken - 65.5 (1080p) [0214B01E].mkv",
+    )
+    .unwrap();
+
+    assert_eq!(subsplease.episode, 65.5);
+
+    let subsplease = File::new(
+        "Tensei Shitara Slime Datta Ken",
+        "[SubsPlease] Tensei Shitara Slime Datta Ken - 66v2 (1080p) [085AEF96].mkv",
+    )
+    .unwrap();
+
+    assert_eq!(subsplease.episode, 66.0);
 
     let moozzi2 = File::new(
         "Fullmetal Alchemist Brotherhood",
@@ -147,7 +167,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(moozzi2.episode, 64);
+    assert_eq!(moozzi2.episode, 64.0);
 
     let moozzi2 = File::new(
         "Spy x Family",
@@ -155,7 +175,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(moozzi2.episode, 12);
+    assert_eq!(moozzi2.episode, 12.0);
 
     let moozzi2 = File::new(
         "Watashi no Shiawase na Kekkon",
@@ -163,7 +183,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(moozzi2.episode, 10);
+    assert_eq!(moozzi2.episode, 10.0);
 
     let ioroid = File::new(
         "Shikanoko Nokonoko Koshitantan",
@@ -171,7 +191,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(ioroid.episode, 2);
+    assert_eq!(ioroid.episode, 2.0);
 
     let ioroid = File::new(
         "Urusei Yatsura",
@@ -179,7 +199,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(ioroid.episode, 23);
+    assert_eq!(ioroid.episode, 23.0);
 
     let without_rel_name = File::new(
         "Kono Subarashii Sekai ni Bakuen wo!",
@@ -187,35 +207,35 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(without_rel_name.episode, 1);
+    assert_eq!(without_rel_name.episode, 1.0);
 
     let without_rel_name = File::new("Sousou no Frieren", "프리렌 1.ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 1);
+    assert_eq!(without_rel_name.episode, 1.0);
 
     let without_rel_name = File::new("Sousou no Frieren", "프리렌 1 (F).ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 1);
+    assert_eq!(without_rel_name.episode, 1.0);
 
     let without_rel_name = File::new("No Game No Life", "nogame01.ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 1);
+    assert_eq!(without_rel_name.episode, 1.0);
 
     let without_rel_name = File::new("No Game No Life", "nogame12.ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 12);
+    assert_eq!(without_rel_name.episode, 12.0);
 
     let without_rel_name = File::new("No Game No Life", "no1game12.ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 12);
+    assert_eq!(without_rel_name.episode, 12.0);
 
     let without_rel_name = File::new("Bocchi the Rock!", "Bocchi the Rock! S01E05.ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 5);
+    assert_eq!(without_rel_name.episode, 5.0);
 
     let without_rel_name = File::new("Bocchi the Rock!", "5.ass").unwrap();
 
-    assert_eq!(without_rel_name.episode, 5);
+    assert_eq!(without_rel_name.episode, 5.0);
 
     let without_rel_name = File::new(
         "Spice and Wolf (2024)",
@@ -223,12 +243,12 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(without_rel_name.episode, 1);
+    assert_eq!(without_rel_name.episode, 1.0);
 
     let without_rel_name =
         File::new("Spice and Wolf (2024)", "Spice and Wolf (2024) S01E04.smi").unwrap();
 
-    assert_eq!(without_rel_name.episode, 4);
+    assert_eq!(without_rel_name.episode, 4.0);
 
     let without_rel_name = File::new(
         "Kaguya-sama wa Kokurasetai",
@@ -236,7 +256,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(without_rel_name.episode, 3);
+    assert_eq!(without_rel_name.episode, 3.0);
 
     let without_rel_name = File::new(
         "Kaguya-sama wa Kokurasetai",
@@ -244,7 +264,7 @@ fn tests_regex() {
     )
     .unwrap();
 
-    assert_eq!(without_rel_name.episode, 11);
+    assert_eq!(without_rel_name.episode, 11.0);
 
     //
     // Dir

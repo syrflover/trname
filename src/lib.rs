@@ -6,10 +6,38 @@ mod file;
 pub use directory::Directory;
 pub use file::File;
 
-/// ./media/love live/Season 01
-///
-/// return: love live S01E01.mkv
-pub fn trname(path: impl AsRef<Path>, file_name: &str, starts_episode_at: isize) -> Option<String> {
+pub fn trname_with(
+    title: &str,
+    season: usize,
+    file_name: &str,
+    starts_episode_at: isize,
+) -> Option<(File, String)> {
+    let mut file = File::new(&title, file_name)?;
+
+    if starts_episode_at.is_negative() {
+        file.episode += starts_episode_at as f32;
+    } else if starts_episode_at.is_positive() {
+        file.episode += (starts_episode_at - 1) as f32;
+    }
+
+    // episode = episode.checked_add_signed()?;
+
+    let after = format!(
+        "{} S{}E{}.{}",
+        title,
+        format_with_leading_zero(season as f32),
+        format_with_leading_zero(file.episode),
+        file.ext
+    );
+
+    Some((file, after))
+}
+
+pub fn trname_raw(
+    path: impl AsRef<Path>,
+    file_name: &str,
+    starts_episode_at: isize,
+) -> Option<(Directory, File, String)> {
     let path = path.as_ref();
     let title = path
         .components()
@@ -29,36 +57,37 @@ pub fn trname(path: impl AsRef<Path>, file_name: &str, starts_episode_at: isize)
 
     // println!("{title} {season}");
 
-    let Directory { season } = Directory::from_normalized(&season)?;
+    let directory = Directory::from_normalized(&season)?;
 
-    let File { mut episode, ext } = File::new(&title, file_name)?;
+    let (file, after) = trname_with(&title, directory.season, file_name, starts_episode_at)?;
 
-    episode = episode.checked_add_signed(if starts_episode_at.is_negative() {
-        starts_episode_at
-    } else if starts_episode_at.is_positive() {
-        starts_episode_at - 1
-    } else {
-        0
-    })?;
-
-    let after = format!(
-        "{} S{}E{}.{}",
-        title,
-        into_least_two_chars(season),
-        into_least_two_chars(episode),
-        ext
-    );
-
-    Some(after)
+    Some((directory, file, after))
 }
 
-fn into_least_two_chars(x: usize) -> String {
-    let x = x.to_string();
-    if x.chars().count() == 1 {
-        "0".to_owned() + &x
-    } else {
-        x
+/// ./media/love live/Season 01
+///
+/// return: love live S01E01.mkv
+pub fn trname(path: impl AsRef<Path>, file_name: &str, starts_episode_at: isize) -> Option<String> {
+    trname_raw(path, file_name, starts_episode_at).map(|x| x.2)
+}
+
+fn format_with_leading_zero(x: f32) -> String {
+    let is_less_than_10 = x < 10.0;
+    // let is_fraction_zero = x.fract() == 0.0;
+
+    let mut x = x.to_string();
+
+    // println!("{x}");
+
+    if is_less_than_10 {
+        x = "0".to_owned() + &x;
     }
+
+    // if is_fraction_zero {
+    //     x = x[..x.len() - 2].to_owned();
+    // }
+
+    x
 }
 
 #[test]
@@ -80,4 +109,15 @@ fn test_trname() {
     );
 
     assert_eq!(actual.unwrap(), "Tensei Shitara Slime Datta Ken S03E14.mkv");
+
+    let actual = trname(
+        PathBuf::from("./media/Shows (current)/Tensei Shitara Slime Datta Ken/Season 03"),
+        "[SubsPlease] Tensei Shitara Slime Datta Ken - 65.5 (1080p) [0214B01E].mkv",
+        -48,
+    );
+
+    assert_eq!(
+        actual.unwrap(),
+        "Tensei Shitara Slime Datta Ken S03E17.5.mkv"
+    );
 }

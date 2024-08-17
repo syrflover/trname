@@ -4,7 +4,7 @@ use inquire::{
     validator::{ErrorMessage, StringValidator, Validation},
     Confirm, Text,
 };
-use trname::{Directory, File};
+use trname::{trname_with, Directory};
 
 fn main() {
     // /<parent>/[HorribleSubs] Kono Subarashii Sekai ni Shukufuku wo! 2 (1-12) (Batch) [1080p]
@@ -93,23 +93,15 @@ fn main() {
         }
     }
 
-    let starts_episode_at = {
-        // if season == 0 {
-        Some(
-            Text::new("starts episode at:")
-                .with_initial_value("1")
-                .with_validator(IsizeValidator {
-                    message: "invalid episode".to_owned(),
-                })
-                .prompt()
-                .unwrap()
-                .parse::<isize>()
-                .unwrap(),
-        )
-        // } else {
-        //     None
-        // }
-    };
+    let starts_episode_at = Text::new("starts episode at:")
+        .with_initial_value("1")
+        .with_validator(IsizeValidator {
+            message: "invalid episode".to_owned(),
+        })
+        .prompt()
+        .unwrap()
+        .parse::<isize>()
+        .unwrap_or(0);
 
     println!();
 
@@ -130,33 +122,16 @@ fn main() {
             if dir_entry.metadata().unwrap().is_file() {
                 let file_name = dir_entry.file_name().into_string().unwrap();
 
-                if let Some(File { mut episode, ext }) = File::new(&title, &file_name) {
-                    if let Some(starts_episode_at) = starts_episode_at {
-                        episode = episode
-                            .checked_add_signed(if starts_episode_at.is_negative() {
-                                starts_episode_at
-                            } else if starts_episode_at.is_positive() {
-                                starts_episode_at - 1
-                            } else {
-                                0
-                            })
-                            .unwrap();
+                match trname_with(&title, season, &file_name, starts_episode_at) {
+                    Some((_file, after)) => {
+                        xs.push((after, dir_entry));
                     }
-
-                    let after = format!(
-                        "{} S{}E{}.{}",
-                        title,
-                        into_least_two_chars(season),
-                        into_least_two_chars(episode),
-                        ext
-                    );
-
-                    xs.push((after, dir_entry));
+                    None => {}
                 }
             }
         }
 
-        xs.sort_by(|a, b| a.0.cmp(&b.0));
+        xs.sort_unstable_by(|a, b| a.0.cmp(&b.0));
 
         xs
     };

@@ -1,5 +1,6 @@
 use regex::Regex;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Directory {
     pub season: usize,
 }
