@@ -12,10 +12,14 @@ pub fn trname_with(
     file_name: &str,
     starts_episode_at: isize,
 ) -> Option<(File, String)> {
-    let mut file = File::new(&title, file_name)?;
+    let mut file = File::new(title, file_name)?;
 
     if starts_episode_at.is_negative() {
-        file.episode += starts_episode_at as f32;
+        let episode = file.episode + starts_episode_at as f32;
+
+        if episode >= 1.0 {
+            file.episode = episode;
+        }
     } else if starts_episode_at.is_positive() {
         file.episode += (starts_episode_at - 1) as f32;
     }
@@ -120,4 +124,12 @@ fn test_trname() {
         actual.unwrap(),
         "Tensei Shitara Slime Datta Ken S03E17.5.mkv"
     );
+
+    let actual = trname(
+        PathBuf::from("./media/Shows (current)/Tensei Shitara Slime Datta Ken/Season 03"),
+        "[SubsPlease] Tensei Shitara Slime Datta Ken - 67 (1080p) [898A0134].mkv",
+        -48,
+    );
+
+    assert_eq!(actual.unwrap(), "Tensei Shitara Slime Datta Ken S03E19.mkv");
 }

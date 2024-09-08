@@ -122,11 +122,10 @@ fn main() {
             if dir_entry.metadata().unwrap().is_file() {
                 let file_name = dir_entry.file_name().into_string().unwrap();
 
-                match trname_with(&title, season, &file_name, starts_episode_at) {
-                    Some((_file, after)) => {
-                        xs.push((after, dir_entry));
-                    }
-                    None => {}
+                if let Some((_file, after)) =
+                    trname_with(&title, season, &file_name, starts_episode_at)
+                {
+                    xs.push((after, dir_entry));
                 }
             }
         }
@@ -188,7 +187,7 @@ fn main() {
             let modified_target = target_dir.join(modified_file_name);
 
             if !modified_target.exists() {
-                fs::rename(&file.path(), &modified_target).unwrap();
+                fs::rename(file.path(), &modified_target).unwrap();
             }
         }
 
