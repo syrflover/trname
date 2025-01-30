@@ -4,41 +4,43 @@ use regex::Regex;
 pub struct File {
     pub episode: f32,
     pub ext: String,
+    pub already_formatted: bool,
 }
 
 impl File {
     pub fn new(title: &str, s: &str) -> Option<Self> {
         fn parse_episode(s: &str) -> Option<f32> {
-            if s.starts_with('0') {
-                return parse_episode(&s[1..]);
-            } else {
-                &s
+            match s.strip_prefix('0') {
+                Some(s) => parse_episode(s),
+                None => s.parse().ok(),
             }
-            .parse()
-            .ok()
         }
 
         let s = s.trim();
 
-        for (cond, regex) in [
+        for (cond, formatted, regex) in [
             (
                 // SxxExx
                 s.starts_with(title),
+                true,
                 r"(?i)^.*S[0-9]{2,2}E(?<episode>[0-9]{2,2}(\.[0-9]{1,1})?)\.(?<ext>\w+)$",
             ),
             (
                 // SubsPlease
                 s.starts_with("[SubsPlease]"),
+                false,
                 r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?)(v[0-9]{1,2})?(\s)?(\((480p|720p|1080p)\))?(\s)?(\[\w+\])?.*\.(?<ext>\w+)$",
             ),
             (
                 // Moozzi2
                 s.starts_with("[Moozzi2]"),
+                false,
                 r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?).+\.(?<ext>\w+)$",
             ),
             (
                 // Ioroid
                 s.starts_with("[Ioroid]"),
+                false,
                 r"(?i)^\[Ioroid\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?)(\s)?(\(.+\))?(\s)?(\[.+\])?.*\.(?<ext>\w+)$",
             ),
         ] {
@@ -49,7 +51,11 @@ impl File {
                     let episode = parse_episode(&captured["episode"])?;
                     let ext = captured["ext"].to_owned();
 
-                    return Some(Self { episode, ext });
+                    return Some(Self {
+                        episode,
+                        ext,
+                        already_formatted: formatted,
+                    });
                 }
             }
         }
@@ -81,7 +87,11 @@ impl File {
 
         let ext = captured["ext"].to_owned();
 
-        Some(Self { episode, ext })
+        Some(Self {
+            episode,
+            ext,
+            already_formatted: false,
+        })
     }
 }
 

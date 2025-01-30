@@ -1,25 +1,40 @@
 use std::{env::current_dir, fs, path::PathBuf};
 
+use clap::Parser;
 use inquire::{
     validator::{ErrorMessage, StringValidator, Validation},
     Confirm, Text,
 };
 use trname::{trname_with, Directory};
 
+#[derive(Debug, Parser)]
+struct Args {
+    #[arg(short, long, default_value_t = false)]
+    pub skip_formatted: bool,
+
+    target_dir: String,
+}
+
+impl Args {
+    pub fn target_dir(&self) -> PathBuf {
+        if self.target_dir.starts_with('/') || self.target_dir.starts_with("./") {
+            self.target_dir.clone()
+        } else {
+            "./".to_owned() + &self.target_dir
+        }
+        .parse::<PathBuf>()
+        .ok()
+        .filter(|p| p.is_dir())
+        .or(current_dir().ok())
+        .expect("invalid path")
+    }
+}
+
 fn main() {
+    let args = Args::parse();
+
     // /<parent>/[HorribleSubs] Kono Subarashii Sekai ni Shukufuku wo! 2 (1-12) (Batch) [1080p]
-    let target_dir = std::env::args()
-        .last()
-        .map(|p| {
-            if p.starts_with('/') || p.starts_with("./") {
-                p
-            } else {
-                "./".to_owned() + &p
-            }
-        })
-        .map(|p| p.parse::<PathBuf>().ok().filter(|p| p.is_dir()))
-        .unwrap_or(current_dir().ok())
-        .expect("invalid path");
+    let target_dir = args.target_dir();
 
     println!("{}", target_dir.as_os_str().to_string_lossy());
 
@@ -122,9 +137,13 @@ fn main() {
             if dir_entry.metadata().unwrap().is_file() {
                 let file_name = dir_entry.file_name().into_string().unwrap();
 
-                if let Some((_file, after)) =
+                if let Some((file, after)) =
                     trname_with(&title, season, &file_name, starts_episode_at)
                 {
+                    if args.skip_formatted && file.already_formatted {
+                        continue;
+                    }
+
                     xs.push((after, dir_entry));
                 }
             }
