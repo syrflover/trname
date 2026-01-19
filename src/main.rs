@@ -42,7 +42,7 @@ fn main() {
         .parent()
         .unwrap()
         .components()
-        .last()
+        .next_back()
         .unwrap()
         .as_os_str()
         .to_string_lossy()
@@ -54,7 +54,7 @@ fn main() {
 
     let last_component_of_target_dir = target_dir
         .components()
-        .last()
+        .next_back()
         .unwrap()
         .as_os_str()
         .to_string_lossy();
@@ -181,13 +181,13 @@ fn main() {
             "{:?} -> {:?}",
             target_dir
                 .components()
-                .last()
+                .next_back()
                 .unwrap()
                 .as_os_str()
                 .to_string_lossy(),
             modified_target_dir
                 .components()
-                .last()
+                .next_back()
                 .unwrap()
                 .as_os_str()
                 .to_string_lossy()

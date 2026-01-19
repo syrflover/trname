@@ -53,7 +53,7 @@ pub fn trname_raw(
         .ok()?;
     let season = path
         .components()
-        .last()?
+        .next_back()?
         .as_os_str()
         .to_os_string()
         .into_string()
