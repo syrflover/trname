@@ -15,14 +15,14 @@ cargo install --path ./trname
 ## 사용
 
 1. 제목 `Lycoris Recoil` 폴더를 생성
-2. `[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP` 를 제목 폴더 안으로 이동함
+2. `[d123] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP` 를 제목 폴더 안으로 이동함
 3. trname 실행
 ```bash
-trname "Lycoris Recoil/[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP"
+trname "Lycoris Recoil/[d123] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP"
 ```
 4. 시즌 넘버 수정
 ```
-./Lycoris Recoil/[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP
+./Lycoris Recoil/[d123] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP
 
 Lycoris Recoil
 
@@ -30,33 +30,33 @@ Lycoris Recoil
 ```
 5. 변경될 파일 이름 및 폴더 이름 확인
 ```
-"[Moozzi2] Lycoris Recoil - 01 (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E01.mkv"
-"[Moozzi2] Lycoris Recoil - 01 (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E01.smi"
-"[Moozzi2] Lycoris Recoil - 02 (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E02.mkv"
-"[Moozzi2] Lycoris Recoil - 02 (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E02.smi"
-"[Moozzi2] Lycoris Recoil - 03 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E03.mkv"
-"[Moozzi2] Lycoris Recoil - 03 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E03.smi"
-"[Moozzi2] Lycoris Recoil - 04 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E04.mkv"
-"[Moozzi2] Lycoris Recoil - 04 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E04.smi"
-"[Moozzi2] Lycoris Recoil - 05 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E05.mkv"
-"[Moozzi2] Lycoris Recoil - 05 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E05.smi"
-"[Moozzi2] Lycoris Recoil - 06 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E06.mkv"
-"[Moozzi2] Lycoris Recoil - 06 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E06.smi"
-"[Moozzi2] Lycoris Recoil - 07 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E07.mkv"
-"[Moozzi2] Lycoris Recoil - 07 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E07.smi"
-"[Moozzi2] Lycoris Recoil - 08 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E08.mkv"
-"[Moozzi2] Lycoris Recoil - 08 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E08.smi"
-"[Moozzi2] Lycoris Recoil - 09 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E09.mkv"
-"[Moozzi2] Lycoris Recoil - 09 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E09.smi"
-"[Moozzi2] Lycoris Recoil - 10 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E10.mkv"
-"[Moozzi2] Lycoris Recoil - 10 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E10.smi"
-"[Moozzi2] Lycoris Recoil - 11 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E11.mkv"
-"[Moozzi2] Lycoris Recoil - 11 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E11.smi"
-"[Moozzi2] Lycoris Recoil - 12 (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E12.mkv"
-"[Moozzi2] Lycoris Recoil - 12 (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E12.smi"
-"[Moozzi2] Lycoris Recoil - 13 END (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E13.mkv"
-"[Moozzi2] Lycoris Recoil - 13 END (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E13.smi"
-"[Moozzi2] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP" -> "Season 01"
+"[d123] Lycoris Recoil - 01 (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E01.mkv"
+"[d123] Lycoris Recoil - 01 (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E01.smi"
+"[d123] Lycoris Recoil - 02 (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E02.mkv"
+"[d123] Lycoris Recoil - 02 (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E02.smi"
+"[d123] Lycoris Recoil - 03 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E03.mkv"
+"[d123] Lycoris Recoil - 03 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E03.smi"
+"[d123] Lycoris Recoil - 04 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E04.mkv"
+"[d123] Lycoris Recoil - 04 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E04.smi"
+"[d123] Lycoris Recoil - 05 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E05.mkv"
+"[d123] Lycoris Recoil - 05 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E05.smi"
+"[d123] Lycoris Recoil - 06 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E06.mkv"
+"[d123] Lycoris Recoil - 06 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E06.smi"
+"[d123] Lycoris Recoil - 07 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E07.mkv"
+"[d123] Lycoris Recoil - 07 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E07.smi"
+"[d123] Lycoris Recoil - 08 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E08.mkv"
+"[d123] Lycoris Recoil - 08 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E08.smi"
+"[d123] Lycoris Recoil - 09 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E09.mkv"
+"[d123] Lycoris Recoil - 09 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E09.smi"
+"[d123] Lycoris Recoil - 10 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E10.mkv"
+"[d123] Lycoris Recoil - 10 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E10.smi"
+"[d123] Lycoris Recoil - 11 (BD 1920x1080 x265-10Bit Flac).mkv" -> "Lycoris Recoil S01E11.mkv"
+"[d123] Lycoris Recoil - 11 (BD 1920x1080 x265-10Bit Flac).smi" -> "Lycoris Recoil S01E11.smi"
+"[d123] Lycoris Recoil - 12 (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E12.mkv"
+"[d123] Lycoris Recoil - 12 (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E12.smi"
+"[d123] Lycoris Recoil - 13 END (BD 1920x1080 x265-10Bit FLACx2).mkv" -> "Lycoris Recoil S01E13.mkv"
+"[d123] Lycoris Recoil - 13 END (BD 1920x1080 x265-10Bit FLACx2).smi" -> "Lycoris Recoil S01E13.smi"
+"[d123] Lycoris Recoil [ x265-10Bit Ver. ] - TV + SP" -> "Season 01"
 
 title: Lycoris Recoil
 season: 1
