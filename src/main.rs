@@ -148,6 +148,11 @@ fn run() -> Result<(), inquire::InquireError> {
                 let file_name = dir_entry.file_name();
                 let file_name = file_name.to_string_lossy();
 
+                // related to windows NTFS Alternate Data Stream
+                if file_name.ends_with(":Zone.Identifier") {
+                    continue;
+                }
+
                 if let Some((file, after)) =
                     trname_with(&title, season, &file_name, starts_episode_at)
                 {
