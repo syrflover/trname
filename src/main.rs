@@ -31,6 +31,18 @@ impl Args {
 }
 
 fn main() {
+    match run() {
+        Ok(_) => {}
+        Err(err) => match err {
+            inquire::InquireError::OperationCanceled
+            | inquire::InquireError::OperationInterrupted => {}
+            err => panic!("{:?}", err),
+        },
+    };
+}
+
+/// return errors when only `prompt()?`
+fn run() -> Result<(), inquire::InquireError> {
     let args = Args::parse();
 
     // /<parent>/[HorribleSubs] Kono Subarashii Sekai ni Shukufuku wo! 2 (1-12) (Batch) [1080p]
@@ -85,8 +97,7 @@ fn main() {
             .with_validator(UsizeValidator {
                 message: "invalid season".to_owned(),
             })
-            .prompt()
-            .unwrap();
+            .prompt()?;
 
         season = text.parse().unwrap();
     }
@@ -113,8 +124,7 @@ fn main() {
         .with_validator(IsizeValidator {
             message: "invalid episode".to_owned(),
         })
-        .prompt()
-        .unwrap()
+        .prompt()?
         .parse::<isize>()
         .unwrap_or(0);
 
@@ -200,7 +210,7 @@ fn main() {
     println!("season: {}", season);
     println!();
 
-    let confirm = Confirm::new("confirm [y/n]:").prompt().unwrap();
+    let confirm = Confirm::new("confirm [y/n]:").prompt()?;
 
     if confirm {
         for (modified_file_name, file) in files {
@@ -215,6 +225,8 @@ fn main() {
             fs::rename(&target_dir, &modified_target_dir).unwrap();
         }
     }
+
+    Ok(())
 }
 
 pub fn into_least_two_chars(x: usize) -> String {
