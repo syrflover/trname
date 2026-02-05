@@ -135,7 +135,8 @@ fn main() {
             }
 
             if dir_entry.metadata().unwrap().is_file() {
-                let file_name = dir_entry.file_name().into_string().unwrap();
+                let file_name = dir_entry.file_name();
+                let file_name = file_name.to_string_lossy();
 
                 if let Some((file, after)) =
                     trname_with(&title, season, &file_name, starts_episode_at)
