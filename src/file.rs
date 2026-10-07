@@ -23,25 +23,25 @@ impl File {
                 // SxxExx
                 s.starts_with(title),
                 true,
-                r"(?i)^.*S[0-9]{2,2}E(?<episode>[0-9]{2,2}(\.[0-9]{1,1})?)\.(?<ext>\w+)$",
+                r"(?i)^.*S[0-9]{2,2}E(?<episode>[0-9]{2,4}(\.[0-9]{1,1})?)\.(?<ext>\w+)$",
             ),
             (
                 // SubsPlease
                 s.starts_with("[SubsPlease]"),
                 false,
-                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?)(v[0-9]{1,2})?(\s)?(\((480p|720p|1080p)\))?(\s)?(\[\w+\])?.*\.(?<ext>\w+)$",
+                r"(?i)^\[SubsPlease\] .+ - (?<episode>[0-9]{1,4}(\.[0-9]{1,1})?)(v[0-9]{1,2})?(\s)?(\((480p|720p|1080p)\))?(\s)?(\[\w+\])?.*\.(?<ext>\w+)$",
             ),
             (
                 // Moozzi2
                 s.starts_with("[Moozzi2]"),
                 false,
-                r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?).+\.(?<ext>\w+)$",
+                r"(?i)^\[Moozzi2\] .+ - (?<episode>[0-9]{1,4}(\.[0-9]{1,1})?).+\.(?<ext>\w+)$",
             ),
             (
                 // Ioroid
                 s.starts_with("[Ioroid]"),
                 false,
-                r"(?i)^\[Ioroid\] .+ - (?<episode>[0-9]{1,2}(\.[0-9]{1,1})?)(\s)?(\(.+\))?(\s)?(\[.+\])?.*\.(?<ext>\w+)$",
+                r"(?i)^\[Ioroid\] .+ - (?<episode>[0-9]{1,4}(\.[0-9]{1,1})?)(\s)?(\(.+\))?(\s)?(\[.+\])?.*\.(?<ext>\w+)$",
             ),
         ] {
             if cond {
@@ -61,7 +61,7 @@ impl File {
         }
 
         let regex_with_rel_name_1 = Regex::new(
-            r"(?i)^\[.+\]\s(.+)\s(?<episode>[0-9]+)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?\w*\.(?<ext>\w+)$",
+            r"(?i)^\[.+\]\s(.+)\s(?<episode>[0-9]+(\.[0-9])?)(\s[a-z]+)?(\s\(.+\))?(\s\[.+\])?\w*\.(?<ext>\w+)$",
         )
         .unwrap();
 

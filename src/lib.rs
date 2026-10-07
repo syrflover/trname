@@ -133,3 +133,43 @@ fn test_trname() {
 
     assert_eq!(actual.unwrap(), "Tensei Shitara Slime Datta Ken S03E19.mkv");
 }
+
+#[test]
+fn test_trname_long_and_half_episodes() {
+    use std::path::PathBuf;
+
+    let one_piece = PathBuf::from("./media/Shows (current)/One Piece/Season 01");
+    let show = PathBuf::from("./media/Shows (current)/Show/Season 01");
+
+    for (path, file_name, expected) in [
+        (
+            &one_piece,
+            "[SubsPlease] One Piece - 1000 (1080p) [ABCD1234].mkv",
+            "One Piece S01E1000.mkv",
+        ),
+        (
+            &one_piece,
+            "[SubsPlease] One Piece - 1001 (1080p) [ABCD1234].mkv",
+            "One Piece S01E1001.mkv",
+        ),
+        (&show, "[Moozzi2] Show - 105 (BD).mkv", "Show S01E105.mkv"),
+        (&show, "[Group] Show - 05.5 (1080p).mkv", "Show S01E05.5.mkv"),
+        (&show, "[Group] Show - 105 (1080p).mkv", "Show S01E105.mkv"),
+        (
+            &show,
+            "[Ioroid] Show - 105 [AMZN WEB-DL 1080p AVC E-AC3].mkv",
+            "Show S01E105.mkv",
+        ),
+        (&show, "Show S01E105.mkv", "Show S01E105.mkv"),
+        (&one_piece, "One Piece S01E1000.mkv", "One Piece S01E1000.mkv"),
+    ] {
+        let actual = trname(path, file_name, 1);
+
+        assert_eq!(actual.as_deref(), Some(expected), "{file_name}");
+    }
+
+    let formatted = File::new("Show", "Show S01E105.mkv").unwrap();
+
+    assert_eq!(formatted.episode, 105.0);
+    assert!(formatted.already_formatted);
+}
